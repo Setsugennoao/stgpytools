@@ -1,0 +1,12 @@
+.eggs/
+.mypy_cache/
+.vscode/
+*.glsl
+*.pyc
+*.vpy
+*.egg-info/*
+/tests/dependencies/*
+/tests/output/*
+build/
+dist/
+stgpytools.egg-info/
