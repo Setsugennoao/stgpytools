@@ -208,7 +208,7 @@ def normalize_ranges(ranges: SoftRangeN | SoftRangesN, end: int) -> list[StrictR
 
 
 def invert_ranges(ranges: SoftRangeN | SoftRangesN, enda: int, endb: int | None) -> list[StrictRange]:
-    norm_ranges = normalize_ranges(enda if endb is None else endb, ranges)
+    norm_ranges = normalize_ranges(ranges, enda if endb is None else endb)
 
     b_frames = {*normalize_ranges_to_list(norm_ranges)}
 
