@@ -28,7 +28,7 @@ MISSING = MissingTBase.MissingT
 
 DataType = Union[str, bytes, bytearray, SupportsString]
 
-FuncExceptT = str | Callable[..., Any] | tuple[Callable[..., Any] | str, str]  # type: ignore
+FuncExceptT = str | Callable[..., Any] | tuple[Callable[..., Any] | str, str]
 """
 This type is used in specific functions that can throw an exception.
 ```
@@ -44,8 +44,6 @@ def some_func() -> None:
 If an error occurs, this will print a clear error ->\n
 ``ValueError: (some_func) Some error occurred!!``
 """
-
-FuncExceptT = str | Callable[..., Any] | tuple[Callable[..., Any] | str, str]  # type: ignore
 
 
 StrArr = SingleOrArr[SupportsString]

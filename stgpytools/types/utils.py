@@ -191,16 +191,16 @@ class inject_self_base(Generic[T, P, R]):
         return _wrapper
 
 
-class inject_self(Generic[T, P, R], inject_self_base[T, P, R]):  # type: ignore
+class inject_self(Generic[T, P, R], inject_self_base[T, P, R]):
     """Wrap a method so it always has a constructed ``self`` provided to it."""
 
-    class cached(Generic[T0, P0, R0], inject_self_base[T0, P0, R0]):  # type: ignore
+    class cached(Generic[T0, P0, R0], inject_self_base[T0, P0, R0]):
         """
         Wrap a method so it always has a constructed ``self`` provided to it.
         Once ``self`` is constructed, it will be reused.
         """
 
-    class init_kwargs(Generic[T0, P0, R0], inject_self_base[T0, P0, R0]):  # type: ignore
+    class init_kwargs(Generic[T0, P0, R0], inject_self_base[T0, P0, R0]):
         """
         Wrap a method so it always has a constructed ``self`` provided to it.
         When constructed, kwargs to the function will be passed to the constructor.
