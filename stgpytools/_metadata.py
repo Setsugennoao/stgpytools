@@ -1,6 +1,6 @@
 """Collection of stuff that's useful in general python programming"""
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 __author__ = 'Setsugen no ao <setsugen@setsugen.dev>'
 __maintainer__ = __author__
