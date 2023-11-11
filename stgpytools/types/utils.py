@@ -292,8 +292,8 @@ class classproperty(Generic[P, R, T, T0, P0]):
             if key in self.__dict__:
                 obj = self.__dict__.get(key)
 
-            if obj and type(obj) is classproperty:
-                return obj.__set__(self, value)
+                if obj and type(obj) is classproperty:
+                    return obj.__set__(self, value)
 
             return super(classproperty.metaclass, self).__setattr__(key, value)
 
