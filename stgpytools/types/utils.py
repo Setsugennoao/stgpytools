@@ -97,7 +97,7 @@ class injected_self_func(Generic[T, P, R], Protocol):  # type: ignore[misc]
         ...
 
 
-self_objects_cache = dict[type[T], T]()
+self_objects_cache = dict[type[T], T]()  # type: ignore
 
 
 class inject_self_base(Generic[T, P, R]):
@@ -424,36 +424,36 @@ class classproperty(Generic[P, R, T, T0, P0]):
 
     def __init__(
         self,
-        fget: classmethod[R] | Callable[P, R],
-        fset: classmethod[None] | Callable[[T, T0], None] | None = None,
-        fdel: classmethod[None] | Callable[P0, None] | None = None,
+        fget: classmethod[T, P, R] | Callable[P, R],
+        fset: classmethod[T, P, None] | Callable[[T, T0], None] | None = None,
+        fdel: classmethod[T, P1, None] | Callable[P1, None] | None = None,
         doc: str | None = None,
     ) -> None:
         if not isinstance(fget, (classmethod, staticmethod)):
-            fget = classmethod(fget)
+            fget = classmethod(fget)  # type: ignore
 
         self.fget = self._wrap(fget)
-        self.fset = self._wrap(fset) if fset is not None else fset
+        self.fset = self._wrap(fset) if fset is not None else fset  # type: ignore
         self.fdel = self._wrap(fdel) if fdel is not None else fdel
 
         self.doc = doc
 
-    def _wrap(self, func: classmethod[R1] | Callable[P1, R1]) -> classmethod[R1]:
+    def _wrap(self, func: classmethod[T1, P1, R1] | Callable[P1, R1]) -> classmethod[T1, P1, R1]:
         if not isinstance(func, (classmethod, staticmethod)):
-            func = classmethod(func)
+            func = classmethod(func)  # type: ignore
 
         return func
 
-    def getter(self, __fget: classmethod[R] | Callable[P1, R1]) -> classproperty[P1, R1, T, T0, P0]:
+    def getter(self, __fget: classmethod[T, P, R] | Callable[P1, R1]) -> classproperty[P1, R1, T, T0, P0]:
         self.fget = self._wrap(__fget)  # type: ignore
         return self  # type: ignore
 
-    def setter(self, __fset: classmethod[None] | Callable[[T1, T2], None]) -> classproperty[P, R, T1, T2, P0]:
-        self.fset = self._wrap(__fset)
+    def setter(self, __fset: classmethod[T1, P, None] | Callable[[T1, T2], None]) -> classproperty[P, R, T1, T2, P0]:
+        self.fset = self._wrap(__fset)  # type: ignore
         return self  # type: ignore
 
-    def deleter(self, __fdel: classmethod[None] | Callable[P1, None]) -> classproperty[P, R, T, T0, P1]:
-        self.fdel = self._wrap(__fdel)
+    def deleter(self, __fdel: classmethod[T1, P1, None] | Callable[P1, None]) -> classproperty[P, R, T, T0, P1]:
+        self.fdel = self._wrap(__fdel)  # type: ignore
         return self  # type: ignore
 
     def __get__(self, __obj: Any, __type: type | None = None) -> R:
@@ -473,7 +473,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
         else:
             type_ = type(__obj)
 
-        return self.fset.__get__(__obj, type_)(__value)
+        return self.fset.__get__(__obj, type_)(__value)  # type: ignore
 
     def __delete__(self, __obj: Any) -> None:
         from ..exceptions import CustomError
@@ -559,7 +559,7 @@ SingleMeta = TypeVar('SingleMeta', bound=type)
 
 
 class SingletonMeta(type):
-    _instances = dict[type[SingleMeta], SingleMeta]()
+    _instances = dict[type[SingleMeta], SingleMeta]()  # type: ignore
     _singleton_init: bool
 
     def __new__(
