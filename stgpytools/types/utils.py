@@ -269,7 +269,7 @@ class inject_kwargs_params_base(Generic[T, P, R]):  # type: ignore
         def _wrapper(self: T, *_args: P.args, **kwargs: P.kwargs) -> R:
             assert this.signature
 
-            if not isinstance(self, class_type):  # type: ignore
+            if class_obj and not isinstance(self, class_type):  # type: ignore
                 _args = (self, *_args)  # type: ignore
                 self = class_obj  # type: ignore
 
