@@ -269,6 +269,10 @@ class inject_kwargs_params_base(Generic[T, P, R]):  # type: ignore
         def _wrapper(self: T, *_args: P.args, **kwargs: P.kwargs) -> R:
             assert this.signature
 
+            if not isinstance(self, class_type):  # type: ignore
+                _args = (self, *_args)  # type: ignore
+                self = class_obj  # type: ignore
+
             if not hasattr(self, this._kwargs_name):  # type: ignore
                 from ..exceptions import CustomRuntimeError
 
@@ -417,7 +421,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
             if key in self.__dict__:
                 obj = self.__dict__.get(key)
 
-                if obj and type(obj) is classproperty:
+                if obj and isinstance(obj, classproperty):
                     return obj.__set__(self, value)
 
             return super(classproperty.metaclass, self).__setattr__(key, value)
