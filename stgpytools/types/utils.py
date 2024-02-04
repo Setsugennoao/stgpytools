@@ -6,7 +6,7 @@ from inspect import _empty as empty_param
 from inspect import isclass
 from typing import (
     TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, Iterable, Iterator, Mapping, NoReturn, Protocol,
-    Sequence, TypeVar, cast, overload
+    Sequence, TypeVar, cast, overload, no_type_check
 )
 
 from .builtins import F0, F1, P0, P1, R0, R1, T0, T1, T2, KwargsT, P, R, T
@@ -426,6 +426,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
 
             return super(classproperty.metaclass, self).__setattr__(key, value)
 
+    @no_type_check
     def __init__(
         self,
         fget: classmethod[T, P, R] | Callable[P, R],
@@ -452,6 +453,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
         self.fget = self._wrap(__fget)  # type: ignore
         return self  # type: ignore
 
+    @no_type_check
     def setter(self, __fset: classmethod[T1, P, None] | Callable[[T1, T2], None]) -> classproperty[P, R, T1, T2, P0]:
         self.fset = self._wrap(__fset)  # type: ignore
         return self  # type: ignore
