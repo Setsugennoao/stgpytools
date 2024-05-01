@@ -24,7 +24,7 @@ setuptools.setup(
     project_urls={
         'Source Code': 'https://github.com/Setsugennoao/stgpytools',
     },
-    python_requires='>=3.11',
+    python_requires='>=3.12',
     packages=[
         package_name,
         f'{package_name}.enums',
