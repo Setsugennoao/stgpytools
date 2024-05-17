@@ -19,7 +19,7 @@ def copy_func(f: F) -> FunctionType:
         g = FunctionType(
             f.__code__, f.__globals__, name=f.__name__, argdefs=f.__defaults__, closure=f.__closure__
         )
-        g = update_wrapper(g, f)
+        g = update_wrapper(g, f)  # type: ignore
         g.__kwdefaults__ = f.__kwdefaults__
         return g
     except BaseException:  # for builtins

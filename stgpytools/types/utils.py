@@ -6,7 +6,7 @@ from inspect import _empty as empty_param
 from inspect import isclass
 from typing import (
     TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, Iterable, Iterator, Mapping, NoReturn, Protocol,
-    Sequence, TypeVar, cast, overload, no_type_check
+    Sequence, TypeVar, cast, no_type_check, overload
 )
 
 from .builtins import F0, F1, P0, P1, R0, R1, T0, T1, T2, KwargsT, P, R, T
@@ -226,12 +226,12 @@ class inject_self(Generic[T, P, R], inject_self_base[T, P, R]):
 
     class property(Generic[T0, R0]):
         def __init__(self, function: Callable[[T0], R0]) -> None:
-            self.function = inject_self(function)  # type: ignore
+            self.function = inject_self(function)
 
         def __get__(
             self, class_obj: type[T0] | T0 | None, class_type: type[T0] | type[type[T0]]  # type: ignore
         ) -> R0:
-            return self.function.__get__(class_obj, class_type)()  # type: ignore
+            return self.function.__get__(class_obj, class_type)()
 
 
 class inject_kwargs_params_base_func(Generic[T, P, R], Callable[Concatenate[T, P], R]):  # type: ignore[misc]
@@ -239,7 +239,7 @@ class inject_kwargs_params_base_func(Generic[T, P, R], Callable[Concatenate[T, P
         ...
 
 
-class inject_kwargs_params_base(Generic[T, P, R]):  # type: ignore
+class inject_kwargs_params_base(Generic[T, P, R]):
     _kwargs_name = 'kwargs'
 
     def __init__(self, function: Callable[Concatenate[T, P], R]) -> None:
@@ -256,7 +256,7 @@ class inject_kwargs_params_base(Generic[T, P, R]):  # type: ignore
             if (
                 isinstance(self, inject_kwargs_params.add_to_kwargs)  # type: ignore
                 and (4 not in {x.kind for x in self.signature.parameters.values()})  # type: ignore
-            ):  # type: ignore
+            ):
                 from ..exceptions import CustomValueError
 
                 raise CustomValueError(
@@ -270,10 +270,10 @@ class inject_kwargs_params_base(Generic[T, P, R]):  # type: ignore
             assert this.signature
 
             if class_obj and not isinstance(self, class_type):  # type: ignore
-                _args = (self, *_args)  # type: ignore
-                self = class_obj  # type: ignore
+                _args = (self, *_args)
+                self = class_obj
 
-            if not hasattr(self, this._kwargs_name):  # type: ignore
+            if not hasattr(self, this._kwargs_name):
                 from ..exceptions import CustomRuntimeError
 
                 raise CustomRuntimeError(
@@ -322,16 +322,16 @@ class inject_kwargs_params_base(Generic[T, P, R]):  # type: ignore
         class _inner(inject_kwargs_params):  # type: ignore
             _kwargs_name = kwargs_name
 
-        return _inner  # type: ignore
+        return _inner
 
 
 if TYPE_CHECKING:  # love you mypy...
     class _add_to_kwargs:
-        def __call__(self, func: F1) -> F1:  # type: ignore
+        def __call__(self, func: F1) -> F1:
             ...
 
     class _inject_kwargs_params:
-        def __call__(self, func: F0) -> F0:  # type: ignore
+        def __call__(self, func: F0) -> F0:
             ...
 
         add_to_kwargs = _add_to_kwargs()
@@ -422,9 +422,10 @@ class classproperty(Generic[P, R, T, T0, P0]):
                 obj = self.__dict__.get(key)
 
                 if obj and isinstance(obj, classproperty):
-                    return obj.__set__(self, value)
+                    obj.__set__(self, value)
+                    return
 
-            return super(classproperty.metaclass, self).__setattr__(key, value)
+            super(classproperty.metaclass, self).__setattr__(key, value)
 
     @no_type_check
     def __init__(
@@ -435,10 +436,10 @@ class classproperty(Generic[P, R, T, T0, P0]):
         doc: str | None = None,
     ) -> None:
         if not isinstance(fget, (classmethod, staticmethod)):
-            fget = classmethod(fget)  # type: ignore
+            fget = classmethod(fget)
 
         self.fget = self._wrap(fget)
-        self.fset = self._wrap(fset) if fset is not None else fset  # type: ignore
+        self.fset = self._wrap(fset) if fset is not None else fset
         self.fdel = self._wrap(fdel) if fdel is not None else fdel
 
         self.doc = doc
@@ -455,8 +456,8 @@ class classproperty(Generic[P, R, T, T0, P0]):
 
     @no_type_check
     def setter(self, __fset: classmethod[T1, P, None] | Callable[[T1, T2], None]) -> classproperty[P, R, T1, T2, P0]:
-        self.fset = self._wrap(__fset)  # type: ignore
-        return self  # type: ignore
+        self.fset = self._wrap(__fset)
+        return self
 
     def deleter(self, __fdel: classmethod[T1, P1, None] | Callable[P1, None]) -> classproperty[P, R, T, T0, P1]:
         self.fdel = self._wrap(__fdel)  # type: ignore
@@ -466,12 +467,12 @@ class classproperty(Generic[P, R, T, T0, P0]):
         if __type is None:
             __type = type(__obj)
 
-        return self.fget.__get__(__obj, __type)()
+        return self.fget.__get__(__obj, __type)()  # type: ignore
 
     def __set__(self, __obj: Any, __value: T1) -> None:
         from ..exceptions import CustomError
 
-        if not self.fset:
+        if not self.fset:  # type: ignore
             raise CustomError[AttributeError]("Can't set attribute")
 
         if isclass(__obj):
@@ -484,7 +485,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
     def __delete__(self, __obj: Any) -> None:
         from ..exceptions import CustomError
 
-        if not self.fdel:
+        if not self.fdel:  # type: ignore
             raise CustomError[AttributeError]("Can't delete attribute")
 
         if isclass(__obj):
@@ -609,7 +610,7 @@ class to_singleton_impl:
             _ts_args = args
             _ts_kwargs = kwargs
 
-        return _inner_singl  # type: ignore
+        return _inner_singl
 
 
 class to_singleton(to_singleton_impl):
