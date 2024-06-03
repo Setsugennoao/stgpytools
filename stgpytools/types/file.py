@@ -4,6 +4,8 @@ from os import PathLike, path
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
 
+from ..functions import to_arr
+
 __all__ = [
     'FilePathType', 'FileDescriptor',
     'FileOpener',
@@ -98,6 +100,11 @@ class SPath(Path):
         errors: str | None = None, newline: str | None = None
     ) -> int:
         return super().write_text('\n'.join(data), encoding, errors, newline)
+
+    def append_to_stem(self, suffixes: str | Iterable[str], sep: str = '_') -> SPath:
+        """Append a suffix to the stem of the path"""
+
+        return self.with_stem(sep.join([self.stem, *to_arr(suffixes)]))  # type:ignore[list-item]
 
 
 SPathLike = Union[str, Path, SPath]
