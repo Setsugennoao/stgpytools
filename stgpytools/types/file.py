@@ -63,12 +63,18 @@ class SPath(Path):
             ...
 
     def format(self, *args: Any, **kwargs: Any) -> SPath:
+        """Format the path with the given arguments."""
+
         return SPath(self.to_str().format(*args, **kwargs))
 
     def to_str(self) -> str:
+        """Cast the path to a string."""
+
         return str(self)
 
     def get_folder(self) -> SPath:
+        """Get the folder of the path."""
+
         folder_path = self.resolve()
 
         if folder_path.is_dir():
@@ -77,9 +83,13 @@ class SPath(Path):
         return SPath(path.dirname(folder_path))
 
     def mkdirp(self) -> None:
+        """Make the dir path with its parents."""
+
         return self.get_folder().mkdir(parents=True, exist_ok=True)
 
     def rmdirs(self, missing_ok: bool = False, ignore_errors: bool = True) -> None:
+        """Remove the dir path with its contents."""
+
         from shutil import rmtree
 
         try:
@@ -91,12 +101,16 @@ class SPath(Path):
     def read_lines(
         self, encoding: str | None = None, errors: str | None = None, keepends: bool = False
     ) -> list[str]:
+        """Read the file and return its lines."""
+
         return super().read_text(encoding, errors).splitlines(keepends)
 
     def write_lines(
         self, data: Iterable[str], encoding: str | None = None,
         errors: str | None = None, newline: str | None = None
     ) -> int:
+        """Open the file and write the given lines."""
+
         return super().write_text('\n'.join(data), encoding, errors, newline)
 
 
