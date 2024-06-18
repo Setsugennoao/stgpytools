@@ -30,13 +30,16 @@ class Coordinate:
     def __init__(self: SelfCoord, x: int, y: int, /) -> None:
         ...
 
-    def __init__(self: SelfCoord, x_or_self: int | tuple[int, int] | SelfCoord, y: int, /) -> None:  # type: ignore
+    def __init__(self: SelfCoord, x_or_self: int | tuple[int, int] | SelfCoord, y: int | None = None, /) -> None:
         from ..exceptions import CustomValueError
 
         if isinstance(x_or_self, int):
             x = x_or_self
         else:
             x, y = x_or_self if isinstance(x_or_self, tuple) else (x_or_self.x, x_or_self.y)
+
+        if y is None:
+            raise CustomValueError("y coordinate must be defined!", self.__class__)
 
         if x < 0 or y < 0:
             raise CustomValueError("Values can't be negative!", self.__class__)
