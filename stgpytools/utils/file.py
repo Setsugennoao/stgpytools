@@ -110,20 +110,20 @@ def check_perms(
         while not check_file.exists():
             check_file = check_file.parent
 
+    if strict and file.is_dir():
+        raise FileIsADirectoryError(file, func)
+
     got_perms = access(check_file, mode_i)
 
     if func is not None:
         if not got_perms:
-            raise FilePermissionError(file, func)
-
-        if strict:
-            if file.is_dir():
-                raise FileIsADirectoryError(file, func)
-            elif not file.exists():
+            if strict and not file.exists():
                 if file.parent.exists():
                     raise FileWasNotFoundError(file, func)
-                else:
-                    raise FileNotExistsError(file, func)
+
+                raise FileNotExistsError(file, func)
+
+            raise FilePermissionError(file, func)
 
     return got_perms
 
