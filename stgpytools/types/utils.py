@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from functools import wraps
+from functools import partial, wraps
 from inspect import Signature
 from inspect import _empty as empty_param
 from inspect import isclass
@@ -435,9 +435,6 @@ class classproperty(Generic[P, R, T, T0, P0]):
         fdel: classmethod[T, P1, None] | Callable[P1, None] | None = None,
         doc: str | None = None,
     ) -> None:
-        if not isinstance(fget, (classmethod, staticmethod)):
-            fget = classmethod(fget)
-
         self.fget = self._wrap(fget)
         self.fset = self._wrap(fset) if fset is not None else fset
         self.fdel = self._wrap(fdel) if fdel is not None else fdel
@@ -495,6 +492,9 @@ class classproperty(Generic[P, R, T, T0, P0]):
 
         return self.fdel.__delete__(__obj, type_)(__obj)  # type: ignore
 
+    def __name__(self) -> str:
+        return self.fget.__name__
+
 
 class cachedproperty(property, Generic[P, R, T, T0, P0]):
     """
@@ -540,10 +540,19 @@ class cachedproperty(property, Generic[P, R, T, T0, P0]):
             ...
 
     def __get__(self, __obj: Any, __type: type | None = None) -> R:
-        function = self.fget.__get__(__obj, __type)  # type: ignore
+        if isinstance(self.fget, classproperty):
+            function = partial(self.fget.__get__, __obj, __type)
+            __obj = __type
 
-        cache = __obj.__dict__.get(cachedproperty.cache_key)
-        name = function.__name__
+            if not hasattr(__obj, cachedproperty.cache_key):
+                setattr(__obj, cachedproperty.cache_key, dict[str, Any]())
+
+            cache = getattr(__obj, cachedproperty.cache_key)
+            name = self.fget.__name__
+        else:
+            function = self.fget.__get__(__obj, __type)  # type: ignore
+            cache = __obj.__dict__.get(cachedproperty.cache_key)
+            name = function.__name__
 
         if name not in cache:
             cache[name] = function()
