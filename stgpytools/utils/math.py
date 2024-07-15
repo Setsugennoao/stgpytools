@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import ceil, log
+from math import ceil, log, log10
 from typing import Sequence
 
 from ..types import Nb
@@ -14,7 +14,9 @@ __all__ = [
 
     'next_power_of_y', 'next_power_of_2',
 
-    'spline_coeff'
+    'spline_coeff',
+
+    'ndigits'
 ]
 
 
@@ -147,3 +149,10 @@ def spline_coeff(
     s -= (py[i] / h - h * matrix[i][length] / 6) * (x - px[j])
 
     return s
+
+
+def ndigits(num: Nb) -> int:
+    if num == 0:
+        return 1
+
+    return int(log10(abs(num))) + 1
