@@ -211,6 +211,15 @@ class inject_self(Generic[T, P, R], inject_self_base[T, P, R]):
         Once ``self`` is constructed, it will be reused.
         """
 
+        class property(Generic[T0, R0]):
+            def __init__(self, function: Callable[[T0], R0]) -> None:
+                self.function = inject_self(function)
+
+            def __get__(
+                self, class_obj: type[T0] | T0 | None, class_type: type[T0] | type[type[T0]]  # type: ignore
+            ) -> R0:
+                return self.function.__get__(class_obj, class_type)()
+
     class init_kwargs(Generic[T0, P0, R0], inject_self_base[T0, P0, R0]):
         """
         Wrap a method so it always has a constructed ``self`` provided to it.
