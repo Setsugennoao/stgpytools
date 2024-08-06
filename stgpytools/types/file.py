@@ -127,9 +127,6 @@ class SPath(Path):
             src_file = self / file
             dst_file = dst / file
 
-            print(file)
-            print('moving', src_file, 'into', dst_file)
-
             if dst_file.exists():
                 src_file.unlink()
             else:
