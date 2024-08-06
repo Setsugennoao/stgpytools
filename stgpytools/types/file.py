@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from os import PathLike, path
+from os import PathLike, listdir, path
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
 
@@ -119,6 +119,23 @@ class SPath(Path):
         from ..functions import to_arr
 
         return self.with_stem(sep.join([self.stem, *to_arr(suffixes)]))  # type:ignore[list-item]
+
+    def move_dir(self, dst: SPath, *, mode: int = 0o777) -> None:
+        dst.mkdir(mode, True, True)
+
+        for file in listdir(self):
+            src_file = self / file
+            dst_file = dst / file
+
+            print(file)
+            print('moving', src_file, 'into', dst_file)
+
+            if dst_file.exists():
+                src_file.unlink()
+            else:
+                src_file.rename(dst_file)
+
+        self.rmdir()
 
 
 SPathLike = Union[str, Path, SPath]
