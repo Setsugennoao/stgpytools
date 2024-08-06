@@ -82,10 +82,10 @@ class SPath(Path):
 
         return SPath(path.dirname(folder_path))
 
-    def mkdirp(self) -> None:
+    def mkdirp(self, mode: int = 0o777) -> None:
         """Make the dir path with its parents."""
 
-        return self.get_folder().mkdir(parents=True, exist_ok=True)
+        return self.get_folder().mkdir(mode, True, True)
 
     def rmdirs(self, missing_ok: bool = False, ignore_errors: bool = True) -> None:
         """Remove the dir path with its contents."""
