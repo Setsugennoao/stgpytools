@@ -43,7 +43,10 @@ def get_script_path() -> SPath:
 
     import __main__
 
-    return SPath(__main__.__file__)
+    try:
+        return SPath(__main__.__file__)
+    except AttributeError:
+        return SPath.cwd()
 
 
 def get_user_data_dir() -> Path:
