@@ -92,7 +92,7 @@ class injected_self_func(Generic[T, P, R], Protocol):  # type: ignore[misc]
     def __call__(cls: type[T], _cls: type[T], *args: P.args, **kwargs: P.kwargs) -> R:
         ...
 
-    @staticmethod  # type: ignore
+    @staticmethod
     def __call__(*args: Any, **kwds: Any) -> Any:
         ...
 
@@ -211,13 +211,13 @@ class inject_self(Generic[T, P, R], inject_self_base[T, P, R]):
         Once ``self`` is constructed, it will be reused.
         """
 
-        class property(Generic[T0, R0]):
-            def __init__(self, function: Callable[[T0], R0]) -> None:
+        class property(Generic[T1, R1]):
+            def __init__(self, function: Callable[[T1], R1]) -> None:
                 self.function = inject_self(function)
 
             def __get__(
-                self, class_obj: type[T0] | T0 | None, class_type: type[T0] | type[type[T0]]  # type: ignore
-            ) -> R0:
+                self, class_obj: type[T1] | T1 | None, class_type: type[T1] | type[type[T1]]  # type: ignore
+            ) -> R1:
                 return self.function.__get__(class_obj, class_type)()
 
     class init_kwargs(Generic[T0, P0, R0], inject_self_base[T0, P0, R0]):
@@ -502,7 +502,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
         return self.fdel.__delete__(__obj, type_)(__obj)  # type: ignore
 
     def __name__(self) -> str:
-        return self.fget.__name__
+        return self.fget.__name__  # type: ignore
 
 
 class cachedproperty(property, Generic[P, R, T, T0, P0]):
