@@ -5,8 +5,6 @@ from os import PathLike, listdir, path
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
 
-from ..exceptions import FileWasNotFoundError
-
 __all__ = [
     'FilePathType', 'FileDescriptor',
     'FileOpener',
@@ -167,7 +165,7 @@ class SPath(Path):
         elif self.is_dir():
             return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
 
-        raise FileWasNotFoundError("Path is neither a file nor a directory")
+        raise ValueError("Path is neither a file nor a directory")
 
     def backup(self, dst: SPath | None = None) -> SPath:
         """Create a backup of the file or directory."""
