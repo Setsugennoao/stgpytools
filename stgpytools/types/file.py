@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+import fnmatch
 import shutil
-from os import PathLike, listdir, path
+from os import PathLike, listdir, path, walk
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
 
@@ -141,6 +142,16 @@ class SPath(Path):
         """Glob the path and return the list of paths."""
 
         return [SPath(p) for p in self.glob(pattern)]
+
+    def fglob(self, pattern: str = '*') -> SPath | None:
+        """Glob the path and return the first match."""
+
+        for root, dirs, files in walk(self):
+            for name in dirs + files:
+                if fnmatch.fnmatch(name, pattern):
+                    return SPath(path.join(root, name))
+
+        return None
 
     def find_newest_file(self, pattern: str = '*') -> SPath | None:
         """Find the most recently modified file matching the given pattern in the directory."""
