@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import shutil
 from os import PathLike, listdir, path
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
+
+from ..exceptions import FileWasNotFoundError
 
 __all__ = [
     'FilePathType', 'FileDescriptor',
@@ -121,6 +124,8 @@ class SPath(Path):
         return self.with_stem(sep.join([self.stem, *to_arr(suffixes)]))  # type:ignore[list-item]
 
     def move_dir(self, dst: SPath, *, mode: int = 0o777) -> None:
+        """Move the directory to the destination."""
+
         dst.mkdir(mode, True, True)
 
         for file in listdir(self):
@@ -133,6 +138,49 @@ class SPath(Path):
                 src_file.rename(dst_file)
 
         self.rmdir()
+
+    def lglob(self, pattern: str = '*') -> list[SPath]:
+        """Glob the path and return the list of paths."""
+
+        return [SPath(p) for p in self.glob(pattern)]
+
+    def find_newest_file(self, pattern: str = '*') -> SPath | None:
+        """Find the most recently modified file matching the given pattern in the directory."""
+
+        matching_files = self.glob(pattern)
+
+        if not matching_files:
+            return None
+
+        return max(matching_files, key=lambda p: p.stat().st_mtime, default=None)  # type:ignore
+
+    def is_empty_dir(self) -> bool:
+        """Check if the directory is empty."""
+
+        return self.is_dir() and not any(self.iterdir())
+
+    def get_size(self) -> int:
+        """Get the size of the file or directory in bytes."""
+
+        if self.is_file():
+            return self.stat().st_size
+        elif self.is_dir():
+            return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
+
+        raise FileWasNotFoundError("Path is neither a file nor a directory")
+
+    def backup(self, dst: SPath | None = None) -> SPath:
+        """Create a backup of the file or directory."""
+
+        backup_path = dst if dst else self.with_suffix(f'{self.suffix}_backup')
+        backup_path.mkdirp()
+
+        if self.is_file():
+            shutil.copy2(self, backup_path)
+        elif self.is_dir():
+            shutil.copytree(self, backup_path)
+
+        return SPath(backup_path)
 
 
 SPathLike = Union[str, Path, SPath]
