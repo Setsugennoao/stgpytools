@@ -6,6 +6,8 @@ from os import PathLike, listdir, path, walk
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
 
+from ..exceptions import NotADirectoryError
+
 __all__ = [
     'FilePathType', 'FileDescriptor',
     'FileOpener',
@@ -141,7 +143,7 @@ class SPath(Path):
     def lglob(self, pattern: str = '*') -> list[SPath]:
         """Glob the path and return the list of paths."""
 
-        return [SPath(p) for p in self.glob(pattern)]
+        return list(map(SPath, self.glob(pattern)))
 
     def fglob(self, pattern: str = '*') -> SPath | None:
         """Glob the path and return the first match."""
@@ -173,23 +175,19 @@ class SPath(Path):
 
         if self.is_file():
             return self.stat().st_size
-        elif self.is_dir():
-            return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
 
-        raise ValueError("Path is neither a file nor a directory")
+        return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
 
-    def backup(self, dst: SPath | None = None) -> SPath:
-        """Create a backup of the file or directory."""
+    def copy_dir(self, dst: SPath) -> SPath:
+        """Copy the directory to the specified destination."""
 
-        backup_path = dst if dst else self.with_suffix(f'{self.suffix}_backup')
-        backup_path.mkdirp()
+        if not self.is_dir():
+            raise NotADirectoryError('The given path, \"{self}\" is not a directory!', self.copy_dir)
 
-        if self.is_file():
-            shutil.copy2(self, backup_path)
-        elif self.is_dir():
-            shutil.copytree(self, backup_path)
+        dst.mkdirp()
+        shutil.copytree(self, dst, dirs_exist_ok=True)
 
-        return SPath(backup_path)
+        return SPath(dst)
 
 
 SPathLike = Union[str, Path, SPath]
