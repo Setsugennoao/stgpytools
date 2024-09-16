@@ -172,7 +172,7 @@ class SPath(Path):
     def find_newest_file(self, pattern: str = '*') -> SPath | None:
         """Find the most recently modified file matching the given pattern in the directory."""
 
-        matching_files = self.glob(pattern)
+        matching_files = self.get_folder().glob(pattern)
 
         if not matching_files:
             return None
