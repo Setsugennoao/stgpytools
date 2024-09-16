@@ -94,10 +94,8 @@ class SPath(Path):
     def rmdirs(self, missing_ok: bool = False, ignore_errors: bool = True) -> None:
         """Remove the dir path with its contents."""
 
-        from shutil import rmtree
-
         try:
-            return rmtree(str(self.get_folder()), ignore_errors)
+            return shutil.rmtree(str(self.get_folder()), ignore_errors)
         except FileNotFoundError:
             if not missing_ok:
                 raise
