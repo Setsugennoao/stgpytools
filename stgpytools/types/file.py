@@ -6,7 +6,7 @@ from os import PathLike, listdir, path, walk
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
 
-from ..exceptions import NotADirectoryError
+from ..exceptions import PathIsNotADirectoryError
 
 __all__ = [
     'FilePathType', 'FileDescriptor',
@@ -182,7 +182,7 @@ class SPath(Path):
         """Copy the directory to the specified destination."""
 
         if not self.is_dir():
-            raise NotADirectoryError('The given path, \"{self}\" is not a directory!', self.copy_dir)
+            raise PathIsNotADirectoryError('The given path, \"{self}\" is not a directory!', self.copy_dir)
 
         dst.mkdirp()
         shutil.copytree(self, dst, dirs_exist_ok=True)
