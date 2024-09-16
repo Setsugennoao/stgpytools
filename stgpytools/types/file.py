@@ -124,8 +124,13 @@ class SPath(Path):
 
         return self.with_stem(sep.join([self.stem, *to_arr(suffixes)]))  # type:ignore[list-item]
 
+    def is_empty_dir(self) -> bool:
+        """Check if the directory is empty."""
+
+        return self.is_dir() and not any(self.iterdir())
+
     def move_dir(self, dst: SPath, *, mode: int = 0o777) -> None:
-        """Move the directory to the destination."""
+        """Move the directory to the specified destination."""
 
         dst.mkdir(mode, True, True)
 
@@ -139,6 +144,17 @@ class SPath(Path):
                 src_file.rename(dst_file)
 
         self.rmdir()
+
+    def copy_dir(self, dst: SPath) -> SPath:
+        """Copy the directory to the specified destination."""
+
+        if not self.is_dir():
+            raise PathIsNotADirectoryError('The given path, \"{self}\" is not a directory!', self.copy_dir)
+
+        dst.mkdirp()
+        shutil.copytree(self, dst, dirs_exist_ok=True)
+
+        return SPath(dst)
 
     def lglob(self, pattern: str = '*') -> list[SPath]:
         """Glob the path and return the list of paths."""
@@ -165,11 +181,6 @@ class SPath(Path):
 
         return max(matching_files, key=lambda p: p.stat().st_mtime, default=None)  # type:ignore
 
-    def is_empty_dir(self) -> bool:
-        """Check if the directory is empty."""
-
-        return self.is_dir() and not any(self.iterdir())
-
     def get_size(self) -> int:
         """Get the size of the file or directory in bytes."""
 
@@ -180,17 +191,5 @@ class SPath(Path):
             return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
 
         raise FileNotExistsError('The given path, \"{self}\" is not a file or directory!', self.get_size)
-
-    def copy_dir(self, dst: SPath) -> SPath:
-        """Copy the directory to the specified destination."""
-
-        if not self.is_dir():
-            raise PathIsNotADirectoryError('The given path, \"{self}\" is not a directory!', self.copy_dir)
-
-        dst.mkdirp()
-        shutil.copytree(self, dst, dirs_exist_ok=True)
-
-        return SPath(dst)
-
 
 SPathLike = Union[str, Path, SPath]
