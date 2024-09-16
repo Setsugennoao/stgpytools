@@ -184,12 +184,13 @@ class SPath(Path):
     def get_size(self) -> int:
         """Get the size of the file or directory in bytes."""
 
+        if not self.exists():
+            raise FileNotExistsError('The given path, \"{self}\" is not a file or directory!', self.get_size)
+
         if self.is_file():
             return self.stat().st_size
 
-        if self.is_dir():
-            return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
+        return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
 
-        raise FileNotExistsError('The given path, \"{self}\" is not a file or directory!', self.get_size)
 
 SPathLike = Union[str, Path, SPath]
