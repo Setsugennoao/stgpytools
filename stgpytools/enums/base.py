@@ -46,19 +46,20 @@ class CustomEnum(Enum):
 
         try:
             return cls(value)
-        except ValueError:
-            ...
+        except Exception:
+            pass
 
         if isinstance(func_except, tuple):
             func_name, var_name = func_except
         else:
-            func_name, var_name = func_except, ''
+            func_name, var_name = func_except, cls
 
         raise NotFoundEnumValue(
-            'Value for "{var_name}" argument must be a valid {enum_name}.\n'
-            'It can be a value in [{readable_enum}].', func_name,
-            var_name=var_name, enum_name=cls,
-            readable_enum=iter([f'{x.name} ({x.value})' for x in cls])
+            'The given value for "{var_name}" argument must be a valid {enum_name}, not "{value}"!\n'
+            'Valid values are: [{readable_enum}].', func_name,
+            var_name=var_name, enum_name=cls, value=value,
+            readable_enum=iter([f'{x.name} ({x.value})' for x in cls]),
+            reason=value
         )
 
 
