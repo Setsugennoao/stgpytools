@@ -8,7 +8,9 @@ __all__ = [
     'FileWasNotFoundError',
     'FilePermissionError',
     'FileTypeMismatchError',
-    'FileIsADirectoryError'
+    'FileIsADirectoryError',
+
+    'PathIsNotADirectoryError',
 ]
 
 
@@ -30,3 +32,7 @@ class FileTypeMismatchError(CustomError, OSError):
 
 class FileIsADirectoryError(CustomError, IsADirectoryError):
     """Raised when you try to access a file but it's a directory instead"""
+
+
+class PathIsNotADirectoryError(CustomError, NotADirectoryError):
+    """Raised when you try to access a directory but it's not a directory"""
