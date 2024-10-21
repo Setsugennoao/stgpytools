@@ -1,8 +1,12 @@
 from __future__ import annotations
 
-from os import PathLike, listdir, path
+import fnmatch
+import shutil
+from os import PathLike, listdir, path, walk
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
+
+from ..exceptions import FileNotExistsError, PathIsNotADirectoryError
 
 __all__ = [
     'FilePathType', 'FileDescriptor',
@@ -89,10 +93,8 @@ class SPath(Path):
     def rmdirs(self, missing_ok: bool = False, ignore_errors: bool = True) -> None:
         """Remove the dir path with its contents."""
 
-        from shutil import rmtree
-
         try:
-            return rmtree(str(self.get_folder()), ignore_errors)
+            return shutil.rmtree(str(self.get_folder()), ignore_errors)
         except FileNotFoundError:
             if not missing_ok:
                 raise
@@ -119,7 +121,14 @@ class SPath(Path):
 
         return self.with_stem(sep.join([self.stem, *to_arr(suffixes)]))  # type:ignore[list-item]
 
+    def is_empty_dir(self) -> bool:
+        """Check if the directory is empty."""
+
+        return self.is_dir() and not any(self.iterdir())
+
     def move_dir(self, dst: SPath, *, mode: int = 0o777) -> None:
+        """Move the directory to the specified destination."""
+
         dst.mkdir(mode, True, True)
 
         for file in listdir(self):
@@ -132,6 +141,53 @@ class SPath(Path):
                 src_file.rename(dst_file)
 
         self.rmdir()
+
+    def copy_dir(self, dst: SPath) -> SPath:
+        """Copy the directory to the specified destination."""
+
+        if not self.is_dir():
+            raise PathIsNotADirectoryError('The given path, \"{self}\" is not a directory!', self.copy_dir)
+
+        dst.mkdirp()
+        shutil.copytree(self, dst, dirs_exist_ok=True)
+
+        return SPath(dst)
+
+    def lglob(self, pattern: str = '*') -> list[SPath]:
+        """Glob the path and return the list of paths."""
+
+        return list(map(SPath, self.glob(pattern)))
+
+    def fglob(self, pattern: str = '*') -> SPath | None:
+        """Glob the path and return the first match."""
+
+        for root, dirs, files in walk(self):
+            for name in dirs + files:
+                if fnmatch.fnmatch(name, pattern):
+                    return SPath(path.join(root, name))
+
+        return None
+
+    def find_newest_file(self, pattern: str = '*') -> SPath | None:
+        """Find the most recently modified file matching the given pattern in the directory."""
+
+        matching_files = self.get_folder().glob(pattern)
+
+        if not matching_files:
+            return None
+
+        return max(matching_files, key=lambda p: p.stat().st_mtime, default=None)  # type:ignore
+
+    def get_size(self) -> int:
+        """Get the size of the file or directory in bytes."""
+
+        if not self.exists():
+            raise FileNotExistsError('The given path, \"{self}\" is not a file or directory!', self.get_size)
+
+        if self.is_file():
+            return self.stat().st_size
+
+        return sum(f.stat().st_size for f in self.rglob('*') if f.is_file())
 
 
 SPathLike = Union[str, Path, SPath]
