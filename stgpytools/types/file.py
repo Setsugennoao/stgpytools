@@ -56,7 +56,6 @@ OpenBinaryMode: TypeAlias = OpenBinaryModeUpdating | OpenBinaryModeReading | Ope
 
 class SPath(Path):
     """Modified version of pathlib.Path"""
-    _flavour = type(Path())._flavour  # type: ignore
 
     if TYPE_CHECKING:
         def __new__(cls, *args: SPathLike, **kwargs: Any) -> SPath:
