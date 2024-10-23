@@ -6,8 +6,6 @@ from os import PathLike, listdir, path, walk
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Literal, TypeAlias, Union
 
-from ..exceptions import FileNotExistsError, PathIsNotADirectoryError
-
 __all__ = [
     'FilePathType', 'FileDescriptor',
     'FileOpener',
@@ -146,6 +144,7 @@ class SPath(Path):
         """Copy the directory to the specified destination."""
 
         if not self.is_dir():
+            from ..exceptions import PathIsNotADirectoryError
             raise PathIsNotADirectoryError('The given path, \"{self}\" is not a directory!', self.copy_dir)
 
         dst.mkdirp()
@@ -182,6 +181,7 @@ class SPath(Path):
         """Get the size of the file or directory in bytes."""
 
         if not self.exists():
+            from ..exceptions import FileNotExistsError
             raise FileNotExistsError('The given path, \"{self}\" is not a file or directory!', self.get_size)
 
         if self.is_file():
