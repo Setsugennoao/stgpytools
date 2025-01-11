@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Callable, Concatenate, overload
+from typing import Any, Callable, Concatenate, overload
 
 from ..exceptions import CustomRuntimeError
 from ..types import MISSING, KwargsT, MissingT, P, R, T
@@ -50,17 +50,17 @@ fallback_missing = object()
 
 
 @overload
-def fallback(value: T | None, fallback: T) -> T:
+def fallback(value: T | None, fallback: T, /) -> T:
     ...
 
 
 @overload
-def fallback(value: T | None, fallback0: T | None, default: T) -> T:
+def fallback(value: T | None, fallback0: T | None, default: T, /) -> T:
     ...
 
 
 @overload
-def fallback(value: T | None, fallback0: T | None, fallback1: T | None, default: T) -> T:
+def fallback(value: T | None, fallback0: T | None, fallback1: T | None, default: T, /) -> T:
     ...
 
 
@@ -74,7 +74,7 @@ def fallback(value: T | None, *fallbacks: T | None, default: T) -> T:
     ...
 
 
-def fallback(value: T | None, *fallbacks: T | None, default: T = fallback_missing) -> T | MissingT:  # type: ignore
+def fallback(value: T | None, *fallbacks: T | None, default: Any | T = fallback_missing) -> T | MissingT:
     """
     Utility function that returns a value or a fallback if the value is None.
 

@@ -52,7 +52,7 @@ class CustomEnum(Enum):
         if isinstance(func_except, tuple):
             func_name, var_name = func_except
         else:
-            func_name, var_name = func_except, cls
+            func_name, var_name = func_except, str(cls)
 
         raise NotFoundEnumValue(
             'The given value for "{var_name}" argument must be a valid {enum_name}, not "{value}"!\n'
