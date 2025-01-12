@@ -11,7 +11,7 @@ __all__ = [
 
 
 def iterate(
-    base: T, function: Callable[Concatenate[T | R, P], T | R],
+    base: T, function: Callable[Concatenate[T | R, P], R],
     count: int, *args: P.args, **kwargs: P.kwargs
 ) -> T | R:
     """
