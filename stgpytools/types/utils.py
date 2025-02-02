@@ -227,9 +227,9 @@ class inject_self(Generic[T, P, R], inject_self_base[T, P, R]):
         """
 
         @classmethod
-        def clean(cls, function: Callable[Concatenate[T0, P0], R0]) -> inject_self[T0, P0, R0]:
+        def clean(cls, function: Callable[Concatenate[T1, P1], R1]) -> inject_self[T1, P1, R1]:
             """Wrap a method, pass kwargs to the constructor and remove them from actual **kwargs."""
-            inj = cls(function)
+            inj = cls(function)  # type: ignore
             inj.clean_kwargs = True
             return inj  # type: ignore
 
