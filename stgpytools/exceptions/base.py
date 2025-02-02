@@ -21,7 +21,9 @@ __all__ = [
 
 
 if TYPE_CHECKING:
-    class ExceptionT(Exception, type):
+    class ExceptionT(Exception):
+        __name__: str
+        __qualname__: str
         ...
 else:
     ExceptionT = Exception
@@ -101,7 +103,7 @@ class CustomError(ExceptionT, metaclass=CustomErrorMeta):
             class inner_exception(cls):  # type: ignore
                 ...
         else:
-            if not issubclass(exception, type):
+            if not issubclass(exception, type):  # type: ignore
                 exception = exception.__class__  # type: ignore
 
             class inner_exception(cls, exception):  # type: ignore
