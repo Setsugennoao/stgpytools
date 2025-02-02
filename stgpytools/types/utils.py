@@ -5,8 +5,8 @@ from inspect import Signature
 from inspect import _empty as empty_param
 from inspect import isclass
 from typing import (
-    TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, Iterable, Iterator, Mapping, NoReturn, Protocol,
-    Sequence, TypeVar, cast, no_type_check, overload
+    TYPE_CHECKING, Any, Callable, Concatenate, Generator, Generic, Iterable, Iterator, Mapping,
+    NoReturn, Protocol, Sequence, TypeVar, cast, overload
 )
 
 from .builtins import F0, F1, P0, P1, R0, R1, T0, T1, T2, KwargsT, P, R, T
@@ -436,7 +436,6 @@ class classproperty(Generic[P, R, T, T0, P0]):
 
             super(classproperty.metaclass, self).__setattr__(key, value)
 
-    @no_type_check
     def __init__(
         self,
         fget: classmethod[T, P, R] | Callable[P, R],
@@ -454,16 +453,15 @@ class classproperty(Generic[P, R, T, T0, P0]):
         if not isinstance(func, (classmethod, staticmethod)):
             func = classmethod(func)  # type: ignore
 
-        return func
+        return func  # type: ignore
 
     def getter(self, __fget: classmethod[T, P, R] | Callable[P1, R1]) -> classproperty[P1, R1, T, T0, P0]:
         self.fget = self._wrap(__fget)  # type: ignore
         return self  # type: ignore
 
-    @no_type_check
     def setter(self, __fset: classmethod[T1, P, None] | Callable[[T1, T2], None]) -> classproperty[P, R, T1, T2, P0]:
-        self.fset = self._wrap(__fset)
-        return self
+        self.fset = self._wrap(__fset)  # type: ignore
+        return self  # type: ignore
 
     def deleter(self, __fdel: classmethod[T1, P1, None] | Callable[P1, None]) -> classproperty[P, R, T, T0, P1]:
         self.fdel = self._wrap(__fdel)  # type: ignore
@@ -478,7 +476,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
     def __set__(self, __obj: Any, __value: T1) -> None:
         from ..exceptions import CustomError
 
-        if not self.fset:  # type: ignore
+        if not self.fset:
             raise CustomError[AttributeError]("Can't set attribute")
 
         if isclass(__obj):
@@ -486,12 +484,12 @@ class classproperty(Generic[P, R, T, T0, P0]):
         else:
             type_ = type(__obj)
 
-        return self.fset.__get__(__obj, type_)(__value)  # type: ignore
+        return self.fset.__get__(__obj, type_)(__value)
 
     def __delete__(self, __obj: Any) -> None:
         from ..exceptions import CustomError
 
-        if not self.fdel:  # type: ignore
+        if not self.fdel:
             raise CustomError[AttributeError]("Can't delete attribute")
 
         if isclass(__obj):
@@ -502,7 +500,7 @@ class classproperty(Generic[P, R, T, T0, P0]):
         return self.fdel.__delete__(__obj, type_)(__obj)  # type: ignore
 
     def __name__(self) -> str:
-        return self.fget.__name__  # type: ignore
+        return self.fget.__name__
 
 
 class cachedproperty(property, Generic[P, R, T, T0, P0]):
@@ -550,7 +548,7 @@ class cachedproperty(property, Generic[P, R, T, T0, P0]):
 
     def __get__(self, __obj: Any, __type: type | None = None) -> R:
         if isinstance(self.fget, classproperty):
-            function = partial(self.fget.__get__, __obj, __type)
+            function = partial(self.fget.__get__, __obj, __type)  # type: ignore
             __obj = __type
 
             if not hasattr(__obj, cachedproperty.cache_key):
