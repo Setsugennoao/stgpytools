@@ -24,7 +24,7 @@ setuptools.setup(
     project_urls={
         'Source Code': 'https://github.com/Setsugennoao/stgpytools',
     },
-    python_requires='>=3.12',
+    python_requires='>=3.10',
     packages=[
         package_name,
         f'{package_name}.enums',
@@ -42,7 +42,7 @@ setuptools.setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Other Audience",
 
-        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Typing :: Typed",
